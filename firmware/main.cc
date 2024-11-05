@@ -11,7 +11,7 @@
 
 namespace
 {
-  constexpr uint32_t kDpPin = 11;
+  constexpr uint32_t kDpPin = 7;
 
   constexpr size_t kUSBMaxPacketLen = 1028;
   constexpr size_t kIncommingCmdLen = 8;
