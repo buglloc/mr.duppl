@@ -67,6 +67,9 @@ add_compile_definitions(
   USBD_PID=0x5052
   USBD_MANUFACTURER="@UTBDK"
   USBD_PRODUCT="Mr.Duppl"
+  # Some rp2040 super mini boards may have trouble booting properly
+	# due to bad componets used in the design.
+  PICO_XOSC_STARTUP_DELAY_MULTIPLIER=32
 )
 
 pico_sdk_init()
