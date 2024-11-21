@@ -1,0 +1,64 @@
+name: Firmware CI
+
+on:
+  push:
+    branches:
+      - main
+    tags:
+      - '*'
+    paths:
+      - 'firmware/**'
+      - '.github/workflows/firmware.yml'
+  pull_request:
+    paths:
+      - 'firmware/**'
+      - '.github/workflows/firmware.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Checkout SDK
+        run: |
+          git clone --depth=1  --branch 2.0.0 https://github.com/raspberrypi/pico-sdk.git
+          cd pico-sdk
+          git submodule update --init
+      - name: Setup Build Dependencies
+        run: sudo apt install cmake gcc-arm-none-eabi libnewlib-arm-none-eabi build-essential libstdc++-arm-none-eabi-newlib
+      - name: Build
+        run: |
+          mkdir build
+          cd build
+          export PICO_SDK_PATH=../pico-sdk
+          cmake ../firmware
+          make
+      - uses: actions/upload-artifact@v3
+        with:
+          name: firmware
+          path: |
+            build/dppl.bin
+            build/dppl.elf
+            build/dppl.elf.map
+            build/dppl.uf2
+          if-no-files-found: error
+
+  release:
+    name: Release
+    runs-on: ubuntu-latest
+    if: "startsWith(github.ref, 'refs/tags/')"
+    needs: [build]
+    steps:
+      - uses: actions/download-artifact@v3
+        with:
+          name: firmware
+      - name: Attach firmware
+        uses: svenstaro/upload-release-action@v2
+        with:
+          file_glob: true
+          file: dppl*
