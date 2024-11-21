@@ -12,7 +12,7 @@ import (
 	"github.com/gopacket/gopacket/pcapgo"
 	"github.com/kor44/extcap"
 
-	"github.com/buglloc/Mr.Duppl/software/pkg/dupplcap"
+	"github.com/buglloc/mr.duppl/software/pkg/dupplcap"
 )
 
 const (
@@ -29,7 +29,7 @@ func main() {
 		Usage: "dupplcap",
 		Version: extcap.VersionInfo{
 			Info: "1.0.0",
-			Help: "https://github.com/buglloc/Mr.Duppl",
+			Help: "https://github.com/buglloc/mr.duppl",
 		},
 		HelpPage:            "DupplCAP - extcap application to integrate Mr.Duppl with Wireshark or something",
 		GetInterfaces:       getAllInterfaces,

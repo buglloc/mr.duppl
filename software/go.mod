@@ -1,4 +1,4 @@
-module github.com/buglloc/Mr.Duppl/software
+module github.com/buglloc/mr.duppl/software
 
 go 1.23.1
 
