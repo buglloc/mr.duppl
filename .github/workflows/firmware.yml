@@ -43,10 +43,10 @@ jobs:
         with:
           name: firmware
           path: |
-            build/dppl.bin
-            build/dppl.elf
-            build/dppl.elf.map
-            build/dppl.uf2
+            build/mr.duppl.bin
+            build/mr.duppl.elf
+            build/mr.duppl.elf.map
+            build/mr.duppl.uf2
           if-no-files-found: error
 
   release:
@@ -62,4 +62,4 @@ jobs:
         uses: svenstaro/upload-release-action@v2
         with:
           file_glob: true
-          file: dppl*
+          file: mr.duppl*
