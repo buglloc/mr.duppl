@@ -30,7 +30,7 @@ var dumpCmd = &cobra.Command{
 	RunE: func(_ *cobra.Command, _ []string) error {
 		dev, err := dupplcap.NewDevice(dumpArgs.Interface)
 		if err != nil {
-			return fmt.Errorf("opening device %s: %w", err)
+			return fmt.Errorf("opening device: %w", err)
 		}
 		defer func() { _ = dev.Close() }()
 
