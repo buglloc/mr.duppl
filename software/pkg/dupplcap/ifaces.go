@@ -8,8 +8,9 @@ import (
 )
 
 const (
-	targetVID = "2E8A"
-	targetPID = "5052"
+	VID  = "2E8A"
+	PID  = "5052"
+	Name = "Mr.Duppl"
 )
 
 type Iface struct {
@@ -29,17 +30,17 @@ func Ifaces() ([]Iface, error) {
 			continue
 		}
 
-		if !strings.EqualFold(port.VID, targetVID) {
+		if !strings.EqualFold(port.VID, VID) {
 			continue
 		}
 
-		if !strings.EqualFold(port.PID, targetPID) {
+		if !strings.EqualFold(port.PID, PID) {
 			continue
 		}
 
 		out = append(out, Iface{
 			Path: port.Name,
-			Name: fmt.Sprintf("Mr.Duppl:%s", port.SerialNumber),
+			Name: fmt.Sprintf("%s:%s", Name, port.SerialNumber),
 		})
 	}
 
