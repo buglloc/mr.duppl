@@ -49,7 +49,7 @@ jobs:
       - name: StaticCheck
         uses: dominikh/staticcheck-action@v1.3.1
         with:
-          version: "2024.1.1"
+          version: "2025.1"
           install-go: false
           working-directory: ./software
 
@@ -60,15 +60,14 @@ jobs:
         platform:
           - ubuntu
         go:
-          - 21
-          - 22
           - 23
+          - 24
     name: 'tests on ${{ matrix.platform }} | 1.${{ matrix.go }}.x'
     runs-on: ${{ matrix.platform }}-latest
     steps:
       # Get the repositery's code
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Set up Golang
         uses: actions/setup-go@v4
