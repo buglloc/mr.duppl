@@ -1,3 +1,4 @@
+#include <cstdint>
 #include <stdio.h>
 #include <string>
 #include <string_view>
@@ -6,12 +7,16 @@
 #include "pico/stdlib.h"
 
 #include "usb.h"
+#include "led.h"
 #include "slip.h"
 
 
 namespace
 {
   constexpr uint32_t kDpPin = 7;
+  constexpr uint32_t kLedPin = 16;
+
+  constexpr uint32_t kBlinkTimeout = 150;
 
   constexpr size_t kUSBMaxPacketLen = 1028;
   constexpr size_t kIncommingCmdLen = 8;
@@ -67,15 +72,28 @@ int main()
   initializeStdio();
   DPPL::USB::Initialize(kDpPin);
 
+  if (kLedPin > 0) {
+    DPPL::LED::Initialize(kLedPin);
+  }
+
   std::basic_string<uint8_t> usbPacket = {};
   usbPacket.reserve(kUSBMaxPacketLen);
 
   std::basic_string<uint8_t> inCommand = {};
   inCommand.reserve(kIncommingCmdLen);
 
+  absolute_time_t packet_time = nil_time;
   while (true) {
+
     if (DPPL::USB::NextPacket(usePacketFolding_, usbPacket) && sendPackets_) {
       processUsbPacket(usbPacket);
+      DPPL::LED::Active();
+      packet_time = make_timeout_time_ms(kBlinkTimeout);
+    }
+
+    if (packet_time != nil_time && absolute_time_diff_us(get_absolute_time(), packet_time) < 0) {
+      DPPL::LED::Inactive();
+      packet_time = nil_time;
     }
 
     if (slipIn_.Read(inCommand)) {

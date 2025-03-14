@@ -1,4 +1,4 @@
-# == DO NEVER EDIT THE NEXT LINES for Raspberry Pi Pico VS Code Extension to work ==
+# == DO NOT EDIT THE FOLLOWING LINES for the Raspberry Pi Pico VS Code Extension to work ==
 if(WIN32)
     set(USERHOME $ENV{USERPROFILE})
 else()
@@ -12,7 +12,7 @@ if (EXISTS ${picoVscode})
     include(${picoVscode})
 endif()
 # ====================================================================================
-# == DO NEVER EDIT THE NEXT LINES for Raspberry Pi Pico VS Code Extension to work ==
+# == DO NOT EDIT THE FOLLOWING LINES for the Raspberry Pi Pico VS Code Extension to work ==
 if(WIN32)
     set(USERHOME $ENV{USERPROFILE})
 else()
@@ -26,7 +26,7 @@ if (EXISTS ${picoVscode})
     include(${picoVscode})
 endif()
 # ====================================================================================
-# == DO NEVER EDIT THE NEXT LINES for Raspberry Pi Pico VS Code Extension to work ==
+# == DO NOT EDIT THE FOLLOWING LINES for the Raspberry Pi Pico VS Code Extension to work ==
 if(WIN32)
     set(USERHOME $ENV{USERPROFILE})
 else()
@@ -40,7 +40,7 @@ if (EXISTS ${picoVscode})
     include(${picoVscode})
 endif()
 # ====================================================================================
-# == DO NEVER EDIT THE NEXT LINES for Raspberry Pi Pico VS Code Extension to work ==
+# == DO NOT EDIT THE FOLLOWING LINES for the Raspberry Pi Pico VS Code Extension to work ==
 if(WIN32)
     set(USERHOME $ENV{USERPROFILE})
 else()
@@ -76,12 +76,21 @@ pico_sdk_init()
 
 add_executable(mr.duppl
   main.cc
+  led.cc
   slip.cc
   usb.cc
 )
 
 pico_generate_pio_header(mr.duppl ${CMAKE_CURRENT_LIST_DIR}/usb_sniff.pio)
+pico_generate_pio_header(mr.duppl ${CMAKE_CURRENT_LIST_DIR}/ws2812.pio)
 
-target_link_libraries(mr.duppl pico_stdlib pico_multicore pico_stdio_usb hardware_pio hardware_dma hardware_irq)
+target_link_libraries(mr.duppl
+  pico_stdlib
+  pico_multicore
+  pico_stdio_usb
+  hardware_pio
+  hardware_dma
+  hardware_irq
+)
 
 pico_add_extra_outputs(mr.duppl)
