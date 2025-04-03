@@ -33,7 +33,7 @@ jobs:
       - name: Set up Golang
         uses: actions/setup-go@v4
         with:
-          go-version: '1.23.x'
+          go-version: '1.24.x'
           check-latest: true
           cache: true
           cache-dependency-path: software/go.sum
@@ -60,7 +60,6 @@ jobs:
         platform:
           - ubuntu
         go:
-          - 23
           - 24
     name: 'tests on ${{ matrix.platform }} | 1.${{ matrix.go }}.x'
     runs-on: ${{ matrix.platform }}-latest

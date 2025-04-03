@@ -1,13 +1,15 @@
 module github.com/buglloc/mr.duppl/software
 
-go 1.23.7
+go 1.23.0
+
+toolchain go1.24.1
 
 require (
 	github.com/gopacket/gopacket v1.3.1
 	github.com/kor44/extcap v0.0.1
 	github.com/spf13/cobra v1.9.1
-	github.com/stretchr/testify v1.8.4
-	go.bug.st/serial v1.6.2
+	github.com/stretchr/testify v1.10.0
+	go.bug.st/serial v1.6.4
 )
 
 require (
