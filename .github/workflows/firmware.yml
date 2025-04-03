@@ -16,22 +16,29 @@ on:
       - '.github/workflows/firmware.yml'
   workflow_dispatch:
 
-permissions:
-  contents: write
-  packages: write
-
 jobs:
   build:
+    name: Build
+    permissions:
+      contents: read
+      pull-requests: read
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v3
+
       - name: Checkout SDK
         run: |
-          git clone --depth=1  --branch 2.0.0 https://github.com/raspberrypi/pico-sdk.git
+          git clone --depth=1  --branch 2.1.1 https://github.com/raspberrypi/pico-sdk.git
           cd pico-sdk
           git submodule update --init
+
       - name: Setup Build Dependencies
-        run: sudo apt install cmake gcc-arm-none-eabi libnewlib-arm-none-eabi build-essential libstdc++-arm-none-eabi-newlib
+        run: |
+          sudo apt update
+          sudo apt install cmake gcc-arm-none-eabi libnewlib-arm-none-eabi build-essential libstdc++-arm-none-eabi-newlib
+
       - name: Build
         run: |
           mkdir build
@@ -39,7 +46,8 @@ jobs:
           export PICO_SDK_PATH=../pico-sdk
           cmake ../firmware
           make
-      - uses: actions/upload-artifact@v3
+
+      - uses: actions/upload-artifact@v4
         with:
           name: firmware
           path: |
@@ -49,17 +57,10 @@ jobs:
             build/mr.duppl.uf2
           if-no-files-found: error
 
-  release:
-    name: Release
-    runs-on: ubuntu-latest
-    if: "startsWith(github.ref, 'refs/tags/')"
-    needs: [build]
-    steps:
-      - uses: actions/download-artifact@v3
-        with:
-          name: firmware
-      - name: Attach firmware
+      - name: Publish
+        if: "startsWith(github.ref, 'refs/tags/')"
         uses: svenstaro/upload-release-action@v2
         with:
-          file_glob: true
-          file: mr.duppl*
+          repo_token: "${{ secrets.PUBLISH_TOKEN }}"
+          prerelease: true
+          file: build/mr.duppl.uf2
