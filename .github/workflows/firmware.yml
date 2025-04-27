@@ -56,6 +56,7 @@ jobs:
           export PICO_SDK_PATH=../pico-sdk
           cmake ../firmware
           make
+          cd ..
           mkdir -p out &&  mv build/mr.duppl.uf2 "out/${{ matrix.artifact }}"
           echo "Done: out/${{ matrix.artifact }}"
 
