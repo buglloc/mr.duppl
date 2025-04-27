@@ -18,11 +18,19 @@ on:
 
 jobs:
   build:
-    name: Build
     permissions:
       contents: read
       pull-requests: read
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: rp2040
+            artifact: mr.duppl_rp2040.u2f
+          - platform: rp2350
+            artifact: mr.duppl_rp2350.u2f
+    name: 'build ${{ matrix.platform }} version'
 
     steps:
       - name: Checkout code
@@ -40,21 +48,22 @@ jobs:
           sudo apt install cmake gcc-arm-none-eabi libnewlib-arm-none-eabi build-essential libstdc++-arm-none-eabi-newlib
 
       - name: Build
+        env:
+          PICO_PLATFORM: "${{ matrix.platform }}"
         run: |
           mkdir build
           cd build
           export PICO_SDK_PATH=../pico-sdk
           cmake ../firmware
           make
+          cd ..
+          mkdir -p out &&  mv build/mr.duppl.uf2 "out/${{ matrix.artifact }}"
+          echo "Done: out/${{ matrix.artifact }}"
 
       - uses: actions/upload-artifact@v4
         with:
-          name: firmware
-          path: |
-            build/mr.duppl.bin
-            build/mr.duppl.elf
-            build/mr.duppl.elf.map
-            build/mr.duppl.uf2
+          name: "firmware-${{ matrix.artifact }}"
+          path: "out/${{ matrix.artifact }}"
           if-no-files-found: error
 
       - name: Publish
@@ -63,4 +72,4 @@ jobs:
         with:
           repo_token: "${{ secrets.PUBLISH_TOKEN }}"
           prerelease: true
-          file: build/mr.duppl.uf2
+          file: "out/${{ matrix.artifact }}"
