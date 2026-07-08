@@ -7,7 +7,7 @@ toolchain go1.24.1
 require (
 	github.com/gopacket/gopacket v1.5.0
 	github.com/kor44/extcap v0.0.1
-	github.com/spf13/cobra v1.10.1
+	github.com/spf13/cobra v1.10.2
 	github.com/stretchr/testify v1.11.1
 	go.bug.st/serial v1.6.4
 )
