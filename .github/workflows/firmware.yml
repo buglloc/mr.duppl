@@ -34,7 +34,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v7
 
       - name: Checkout SDK
         run: |
@@ -60,7 +60,7 @@ jobs:
           mkdir -p out &&  mv build/mr.duppl.uf2 "out/${{ matrix.artifact }}"
           echo "Done: out/${{ matrix.artifact }}"
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: "firmware-${{ matrix.artifact }}"
           path: "out/${{ matrix.artifact }}"
