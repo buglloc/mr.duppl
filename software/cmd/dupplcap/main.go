@@ -19,39 +19,41 @@ const (
 	usePacketFoldingOpt = "packet-folding"
 )
 
-var (
-	usePacketFolding = extcap.NewConfigBoolOpt(usePacketFoldingOpt, "Use packet folding").
-		Default(true)
-)
+func newUsePacketFoldingArg() *extcap.BoolArg {
+	return &extcap.BoolArg{
+		Name:    usePacketFoldingOpt,
+		Display: "Use packet folding",
+		Default: true,
+	}
+}
 
 func main() {
 	app := extcap.App{
-		Usage: "dupplcap",
-		Version: extcap.VersionInfo{
-			Info: "1.0.0",
-			Help: "https://github.com/buglloc/mr.duppl",
-		},
-		HelpPage:            "DupplCAP - extcap application to integrate Mr.Duppl with Wireshark or something",
-		GetInterfaces:       getAllInterfaces,
-		GetDLT:              getDLT,
-		GetAllConfigOptions: getAllConfigOptions,
-		GetConfigOptions:    getConfigOptions,
-		StartCapture:        startCapture,
+		Description:    "DupplCAP - extcap application to integrate Mr.Duppl with Wireshark or something",
+		Version:        "1.0.0",
+		HelpPage:       "https://github.com/buglloc/mr.duppl",
+		ListInterfaces: getAllInterfaces,
+		ListLinkType:   getDLT,
+		ListArgs:       getConfigOptions,
+		StartCapture:   startCapture,
 	}
 
-	app.Run(os.Args)
+	if err := app.Run(os.Args); err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		os.Exit(2)
+	}
 }
 
-func getAllInterfaces() ([]extcap.CaptureInterface, error) {
+func getAllInterfaces() ([]extcap.Interface, error) {
 	ifaces, err := dupplcap.Ifaces()
 	if err != nil {
 		return nil, fmt.Errorf("unable to get information about interfaces: %w", err)
 	}
 
-	extIfaces := make([]extcap.CaptureInterface, len(ifaces))
+	extIfaces := make([]extcap.Interface, len(ifaces))
 	for i, iface := range ifaces {
 		// we use Name as Value to deal with Mr.Duppl replugs
-		extIfaces[i] = extcap.CaptureInterface{
+		extIfaces[i] = extcap.Interface{
 			Value:   iface.Name,
 			Display: iface.Path,
 		}
@@ -60,29 +62,20 @@ func getAllInterfaces() ([]extcap.CaptureInterface, error) {
 	return extIfaces, nil
 }
 
-func getDLT(_ string) (extcap.DLT, error) {
-	return extcap.DLT{
+func getDLT(_ string) (extcap.LinkType, error) {
+	return extcap.LinkType{
 		Number: dupplcap.LinkTypeUSBFullSpeed.Int(),
 		Name:   dupplcap.LinkTypeUSBFullSpeed.String(),
 	}, nil
 }
 
-func getConfigOptions(_ string) ([]extcap.ConfigOption, error) {
-	opts := []extcap.ConfigOption{
-		usePacketFolding,
-	}
-
-	return opts, nil
+func getConfigOptions(_ string) ([]extcap.Arg, error) {
+	return []extcap.Arg{
+		newUsePacketFoldingArg(),
+	}, nil
 }
 
-func getAllConfigOptions() []extcap.ConfigOption {
-	opts := []extcap.ConfigOption{
-		usePacketFolding,
-	}
-	return opts
-}
-
-func startCapture(iface string, pipe io.WriteCloser, _ string, opts map[string]any) error {
+func startCapture(iface string, pipe io.WriteCloser, _ string, args *extcap.CaptureArgs) error {
 	defer func() { _ = pipe.Close() }()
 
 	dev, err := dupplcap.NewDeviceByName(iface)
@@ -91,14 +84,12 @@ func startCapture(iface string, pipe io.WriteCloser, _ string, opts map[string]a
 	}
 	defer func() { _ = dev.Close() }()
 
-	packetFoldingEnabled := true
-	if val, ok := opts[usePacketFoldingOpt]; ok {
-		if en, ok := val.(bool); ok {
-			packetFoldingEnabled = en
-		}
+	usePacketFolding := newUsePacketFoldingArg()
+	if err := args.ParseArgs([]extcap.Arg{usePacketFolding}); err != nil {
+		return fmt.Errorf("parse args: %w", err)
 	}
 
-	if err := dev.StartCapture(packetFoldingEnabled); err != nil {
+	if err := dev.StartCapture(usePacketFolding.Value()); err != nil {
 		return fmt.Errorf("start capture: %w", err)
 	}
 	defer func() { _ = dev.StopCapture() }()
