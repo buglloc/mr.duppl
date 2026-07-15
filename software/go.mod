@@ -7,7 +7,7 @@ require (
 	github.com/kor44/extcap v0.0.2
 	github.com/spf13/cobra v1.10.2
 	github.com/stretchr/testify v1.11.1
-	go.bug.st/serial v1.7.1
+	go.bug.st/serial v1.8.0
 )
 
 require (
